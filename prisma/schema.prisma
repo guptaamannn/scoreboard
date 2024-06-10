@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider                 = "pnpm zod-prisma-types"
+  output                   = "./zod"
+  useMultipleFiles         = true // default is false
+  writeBarrelFiles         = true // default is true
+  createInputTypes         = false // default is true
+  createModelTypes         = true // default is true
+  addInputTypeValidation   = false // default is true
+  addIncludeType           = false // default is true
+  addSelectType            = false // default is true
+  validateWhereUniqueInput = false
+  useDefaultValidators     = false
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  // directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id             String    @id
+  email          String    @unique
+  hashedPassword String
+  name           String?
+  username       String?   @unique
+  image          String?
+  sessions       Session[]
+  friends        Friend[]  @relation("user1")
+  friendsOf      Friend[]  @relation("user2")
+
+  score        Score[]
+  games        Game[]  @relation("players")
+  gamesCreated Game[]  @relation("gameCreator")
+  Round        Round[] @relation("roundCreator")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+model Friend {
+  id        String       @id @default(cuid())
+  user1     String
+  user2     String
+  status    FriendStatus @default(PENDING)
+  user1User User         @relation("user1", fields: [user1], references: [id], onDelete: Cascade)
+  user2User User         @relation("user2", fields: [user2], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([user1, user2])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+}
+
+model Game {
+  id            Int      @id @default(autoincrement())
+  creatorId     String
+  creator       User     @relation("gameCreator", fields: [creatorId], references: [id])
+  description   String?
+  players       User[]   @relation("players")
+  ended         Boolean  @default(false)
+  showTotal     Boolean  @default(false)
+  highestWins   Boolean  @default(false)
+  hideOpponents Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  scores        Score[]
+  rounds        Round[]
+}
+
+model Round {
+  id        Int     @id @default(autoincrement())
+  creatorId String
+  creator   User    @relation("roundCreator", fields: [creatorId], references: [id])
+  gameId    Int
+  game      Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  scores    Score[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Score {
+  id        Int      @id @default(autoincrement())
+  playerId  String
+  gameId    Int
+  points    Int
+  createdAt DateTime @default(now())
+
+  player  User   @relation(fields: [playerId], references: [id])
+  game    Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  Round   Round? @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId Int?
+}
