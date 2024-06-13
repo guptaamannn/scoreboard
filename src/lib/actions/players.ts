@@ -6,6 +6,16 @@ import { updateUserParams, UpdateUserParams } from "../db/schema/users";
 
 const revalidateGames = () => revalidatePath("/games");
 
+const handleErrors = (e: unknown) => {
+    const errMsg = "Error, please try again.";
+    if (e instanceof Error) return e.message.length > 0 ? e.message : errMsg;
+    if (e && typeof e === "object" && "error" in e) {
+        const errAsStr = e.error as string;
+        return errAsStr.length > 0 ? errAsStr : errMsg;
+    }
+    return errMsg;
+};
+
 export const updateUserAction = async (user: UpdateUserParams) => {
     try {
         const payload = updateUserParams.parse(user);
@@ -13,6 +23,6 @@ export const updateUserAction = async (user: UpdateUserParams) => {
         revalidateGames();
         return { user: u };
     } catch (e) {
-        console.error(e);
+        return handleErrors(e);
     }
 }

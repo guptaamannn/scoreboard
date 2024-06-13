@@ -30,7 +30,7 @@ export default function OnboardingComponent({ user }: OnboardingProps) {
     router.push("/games");
   };
 
-  const handleSubmit = (data: FormData) => {
+  const handleSubmit = async (data: FormData) => {
     setErrors(null);
 
     const payload = Object.fromEntries(data.entries());
@@ -39,11 +39,18 @@ export default function OnboardingComponent({ user }: OnboardingProps) {
       setErrors(userParsed.error.formErrors.fieldErrors);
       return;
     }
+
     const values = userParsed.data;
+
     try {
-      const error = updateUserAction({ ...user, ...values });
-      console.log(error);
+      const error = await updateUserAction({ ...user, ...values });
+      if (error) {
+        setErrors({ username: ["Username taken!"] });
+        return;
+      }
     } catch (error) {
+      console.log("error caught");
+      toast.error("Error updating user");
       console.log(error);
     }
   };

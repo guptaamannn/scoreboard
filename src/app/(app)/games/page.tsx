@@ -2,9 +2,8 @@ import { Suspense } from "react";
 
 import Loading from "@/app/loading";
 import GameList from "@/components/games/GameList";
-import { AuthSession, getUserAuth, SessionUser } from "@/lib/auth/utils";
-import { Player, UpdateUserParams } from "@/lib/db/schema/users";
-import OnboardingComponent from "@/components/games/Onboard";
+import { getUserAuth } from "@/lib/auth/utils";
+import { Player } from "@/lib/db/schema/users";
 
 export const revalidate = 0;
 
@@ -20,7 +19,6 @@ export default async function GamesPage() {
         <Suspense fallback={<Loading />}>
           <GameList user={session?.user as Player} />
         </Suspense>
-        <OnboardingComponent user={session?.user} />
       </div>
     </main>
   );
