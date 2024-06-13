@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AuthFormError from "@/components/auth/AuthFormError";
-
+import HeaderLogo from "@/components/auth/HeaderLogo";
 
 export default function SignUpPage() {
   const [state, formAction] = useFormState(signUpAction, {
@@ -18,8 +18,9 @@ export default function SignUpPage() {
   });
 
   return (
-    <main className="max-w-lg mx-auto my-4 bg-popover p-10">
-      <h1 className="text-2xl font-bold text-center">Create an account</h1>
+    <main className="fixed top-[50%] w-full max-w-lg translate-y-[-50%] space-y-6 rounded-lg bg-popover p-10 md:left-[50%] md:translate-x-[-50%]">
+      <HeaderLogo />
+      <h1 className="text-center text-2xl font-bold">Create an account</h1>
       <AuthFormError state={state} />
       <form action={formAction}>
         <Label htmlFor="email" className="text-muted-foreground">
@@ -34,7 +35,7 @@ export default function SignUpPage() {
         <br />
         <SubmitButton />
       </form>
-      <div className="mt-4 text-muted-foreground text-center text-sm">
+      <div className="mt-4 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link href="/sign-in" className="text-secondary-foreground underline">
           Sign in

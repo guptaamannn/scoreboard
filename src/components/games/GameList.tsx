@@ -23,23 +23,16 @@ import {
 } from "../ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
+
 import { useQuery } from "@tanstack/react-query";
 import { getGames } from "@/lib/api/games/queries";
 import { deleteGameAction } from "@/lib/actions/games";
+import GameListTile from "./GameListTile";
+import DeleteButton from "../shared/DeleteButton";
 
 type TOpenModal = (game?: Game) => void;
 
 export default function GameList({ user }: { user: Player }) {
-  // const { optimisticGames, addOptimisticGame } = useOptimisticGames(games);
   const [open, setOpen] = useState(false);
   const [activeGame, setActiveGame] = useState<Game | null>(null);
   const openModal = (game?: Game) => {
@@ -64,13 +57,6 @@ export default function GameList({ user }: { user: Player }) {
         title={activeGame ? "Edit Game" : "Create Game"}
         description="Create a new game."
       >
-        {/* <GameForm
-          game={activeGame}
-          user={user}
-          addOptimistic={addOptimisticGame}
-          openModal={openModal}
-          closeModal={closeModal}
-        /> */}
         <GameForm user={user} closeModal={closeModal} />
       </Modal>
       <div className="absolute right-0 top-6">
@@ -79,73 +65,71 @@ export default function GameList({ user }: { user: Player }) {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Players</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Descriptions</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data?.games.map((game) => (
-            <TableRow key={game.id}>
-              <TableCell>
-                <div className="flex flex-row-reverse justify-end -space-x-3 space-x-reverse">
-                  {game.players.map((p) => (
-                    <Avatar key={p.id}>
-                      <AvatarImage src={p.image ?? ""} />
-                      <AvatarFallback>{p.username![0]}</AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-medium">
-                    {format(game.createdAt, "MMM dd, yyyy")}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {format(game.createdAt, "h:mm a")}
-                  </span>
-                </div>
-              </TableCell>
-
-              <TableCell>
-                <Badge variant={game.ended ? "destructive" : "default"}>
-                  {game.ended ? "Ended" : "Ongoing"}
-                </Badge>
-              </TableCell>
-              <TableCell>{game.description}</TableCell>
-              <TableCell className="space-x-2">
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href={`/games/${game.id}`}>
-                    <Eye className="h-4 w-4 text-black" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={async () => {
-                    await deleteGameAction(game.id);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TableCell>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Players</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Descriptions</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {/* <Pagination className="mt-6 justify-end">
-        <PaginationContent>
-          <PaginationPrevious size={"sm"} />
+          </TableHeader>
+          <TableBody>
+            {data?.games.map((game) => (
+              <TableRow key={game.id}>
+                <TableCell>
+                  <div className="flex flex-row-reverse justify-end -space-x-3 space-x-reverse">
+                    {game.players.map((p) => (
+                      <Avatar key={p.id}>
+                        <AvatarImage src={p.image ?? ""} />
+                        <AvatarFallback>{p.username![0]}</AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {format(game.createdAt, "MMM dd, yyyy")}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(game.createdAt, "h:mm a")}
+                    </span>
+                  </div>
+                </TableCell>
 
-          <PaginationNext size={"sm"} />
-        </PaginationContent>
-      </Pagination> */}
+                <TableCell>
+                  <Badge variant={game.ended ? "destructive" : "default"}>
+                    {game.ended ? "Ended" : "Ongoing"}
+                  </Badge>
+                </TableCell>
+                <TableCell>{game.description}</TableCell>
+                <TableCell className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href={`/games/${game.id}`}>
+                      <Eye className="h-4 w-4 text-black" />
+                    </Link>
+                  </Button>
+
+                  {game.creatorId === user.id && (
+                    <DeleteButton
+                      deleteAction={() => deleteGameAction(game.id)}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <ul className="md:hidden md:w-0">
+        {data?.games.map((game) => <GameListTile key={game.id} game={game} />)}
+      </ul>
+
+      {data?.games.length === 0 && <EmptyState openModal={openModal} />}
     </div>
   );
 }

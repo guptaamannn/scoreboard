@@ -1,10 +1,10 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Credenza,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaHeader,
+  CredenzaTitle,
+} from "../ui/credenza";
 
 export default function Modal({
   title,
@@ -20,14 +20,14 @@ export default function Modal({
   children: React.ReactNode;
 }) {
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogContent>
-        <DialogHeader className="px-5 pt-5">
-          <DialogTitle>{title ?? "Modal"}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
+    <Credenza onOpenChange={setOpen} open={open}>
+      <CredenzaContent>
+        <CredenzaHeader className="px-5 pt-5">
+          <CredenzaTitle>{title ?? "Modal"}</CredenzaTitle>
+          <CredenzaDescription>{description}</CredenzaDescription>
+        </CredenzaHeader>
         <div className="px-5 pb-5">{children}</div>
-      </DialogContent>
-    </Dialog>
+      </CredenzaContent>
+    </Credenza>
   );
 }
