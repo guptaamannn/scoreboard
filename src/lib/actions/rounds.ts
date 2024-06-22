@@ -19,8 +19,9 @@ const revalidateScoreboard = (gameId: string) => revalidatePath(`/games/${gameId
 export const createRoundAction = async (input: NewRoundParams) => {
     try {
         const payload = insertRoundParams.parse(input);
-        await createRound(payload);
-        revalidateScoreboard(payload.gameId.toString());
+       const result = await createRound(payload);
+       return result;
+        // revalidateScoreboard(payload.gameId.toString());
     } catch (e) {
         return handleErrors(e);
     }

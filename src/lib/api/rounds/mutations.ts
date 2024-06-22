@@ -11,8 +11,12 @@ export const createRound = async (round: NewRoundParams) => {
                 scores: {
                     create: newRound.scores
                 }
+            },
+            include: {
+                scores: true
             }
-        });
+        }
+        );
         return { round: r };
     } catch (err) {
         const message = (err as Error).message ?? "Error, please try again";
