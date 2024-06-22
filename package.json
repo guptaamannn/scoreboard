@@ -4,9 +4,10 @@
   "private": true,
   "packageManager": "pnpm@9.1.2",
   "scripts": {
-    "dev": "next dev",
-    "build": "pnpm dlx prisma generate && next build",
-    "start": "next start",
+    "dev": "tsc-watch --noClear -P ./tsconfig.server.json --onSuccess \"node dist/server.js\"",
+    "build": "pnpm dlx prisma generate && pnpm build:server && next build",
+    "build:server": "tsc --project tsconfig.server.json",
+    "start": "NODE_ENV=production node dist/server.js",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -40,6 +41,8 @@
     "oslo": "^1.2.0",
     "react": "^18",
     "react-dom": "^18",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
@@ -57,6 +60,7 @@
     "prettier-plugin-tailwindcss": "^0.6.1",
     "prisma": "^5.14.0",
     "tailwindcss": "^3.4.1",
+    "tsc-watch": "^6.2.0",
     "typescript": "^5",
     "zod-prisma-types": "^3.1.8"
   }

@@ -7,6 +7,5 @@ export const useGameById = (gameId: GameId) => {
   return useQuery({
     queryKey: ["game", gameId],
     queryFn: async () => await getGameById(gameId),
-    refetchInterval: 5000,
   });
 };

@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function GameTile({ game }: { game: CompleteGame }) {
   return (
     <Link href={`/games/${game.id}`} prefetch>
-      <Card className="relative flex items-center gap-4 rounded-lg p-4 shadow-sm transition-shadow hover:shadow-md">
+      <Card className="relative mb-4 flex items-center gap-4 rounded-lg p-4 shadow-sm transition-shadow hover:shadow-md">
         <div className="grid flex-1 gap-1.5">
           <div className="text-sm font-medium">
             {format(game.createdAt, "MMM dd, yyyy")}

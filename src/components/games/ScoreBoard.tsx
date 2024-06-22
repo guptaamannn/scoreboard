@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 
 import { Input } from "../ui/input";
@@ -20,6 +20,7 @@ import Modal from "../shared/Modal";
 import BackButton from "../shared/BackButton";
 import GameEditForm from "./GameEditForm";
 import ScoreTable from "./ScoreTable";
+import { useSocket } from "../SocketProvider";
 
 const ScoreBoard = ({
   userId,
@@ -32,11 +33,24 @@ const ScoreBoard = ({
 }) => {
   const [open, setOpen] = useState(false);
   const { data, refetch } = useGameById(gameId);
+  const { joinRoom, updateGame, game: socketGame } = useSocket();
+  const [board, setBoard] = useState<GameById>();
 
   const closeModal = async () => {
     setOpen(false);
-    await refetch();
+    const res = await refetch();
+    updateGame(res.data?.game!);
   };
+
+  useEffect(() => {
+    joinRoom(gameId.toString());
+  }, [gameId, joinRoom]);
+
+  useEffect(() => {
+    if (socketGame) {
+      setBoard(socketGame);
+    }
+  }, [socketGame, updateGame]);
 
   if (!data) return null;
   const game = data.game;
@@ -66,7 +80,13 @@ const ScoreBoard = ({
               </div>
             </div>
             {user.id === data.game?.creatorId && (
-              <GameEditForm game={data.game} refetch={refetch} />
+              <GameEditForm
+                game={data.game}
+                refetch={async () => {
+                  const res = await refetch();
+                  updateGame(res.data?.game!);
+                }}
+              />
             )}
           </div>
         </CardHeader>
@@ -87,7 +107,7 @@ const ScoreBoard = ({
             <p>{game?.creator.username}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            {game?.highestWins ? "Highest" : "Lowest"} total wins!
+            {board?.highestWins ? "Highest" : "Lowest"} total wins!
           </p>
         </CardFooter>
         <div
@@ -95,7 +115,7 @@ const ScoreBoard = ({
         ></div>
       </Card>
 
-      <ScoreTable game={game} />
+      <ScoreTable game={board || game} />
 
       {game?.creatorId === userId && !game?.ended && (
         <div className="mt-6 flex w-full justify-end">
@@ -139,7 +159,8 @@ const ScoreForm = ({
       return;
     }
 
-    await createRoundAction(roundParsed.data);
+    const newRound = await createRoundAction(roundParsed.data);
+
     closeModal();
   };
 
