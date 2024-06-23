@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { format } from "date-fns";
 
-import { cn } from "@/lib/utils";
-import { type Game, CompleteGame } from "@/lib/db/schema/games";
+import { type Game } from "@/lib/db/schema/games";
 import Modal from "@/components/shared/Modal";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
 import { useQuery } from "@tanstack/react-query";
@@ -29,6 +26,7 @@ import { getGames } from "@/lib/api/games/queries";
 import { deleteGameAction } from "@/lib/actions/games";
 import GameListTile from "./GameListTile";
 import DeleteButton from "../shared/DeleteButton";
+import PlayerAvatar from "../shared/PlayerAvatar";
 
 type TOpenModal = (game?: Game) => void;
 
@@ -82,10 +80,7 @@ export default function GameList({ user }: { user: Player }) {
                 <TableCell>
                   <div className="flex flex-row-reverse justify-end -space-x-3 space-x-reverse">
                     {game.players.map((p) => (
-                      <Avatar key={p.id}>
-                        <AvatarImage src={p.image ?? ""} />
-                        <AvatarFallback>{p.username![0]}</AvatarFallback>
-                      </Avatar>
+                      <PlayerAvatar player={p} key={p.id} showTooltip />
                     ))}
                   </div>
                 </TableCell>
