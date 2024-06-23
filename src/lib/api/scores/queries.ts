@@ -31,7 +31,11 @@ export const getTotal = async (gameId: GameId) => {
         where: {
             gameId
         },
-
+        orderBy: {
+            _sum: {
+                points: 'asc'
+            }
+        }
     })
 
     return { scores: r };

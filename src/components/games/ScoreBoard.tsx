@@ -5,7 +5,6 @@ import { format } from "date-fns";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
 
 import { GameById, GameId } from "@/lib/db/schema/games";
@@ -21,6 +20,8 @@ import BackButton from "../shared/BackButton";
 import GameEditForm from "./GameEditForm";
 import ScoreTable from "./ScoreTable";
 import { useSocket } from "../SocketProvider";
+import PlayerAvatar from "../shared/PlayerAvatar";
+import FinalScores from "./FinalScores";
 
 const ScoreBoard = ({
   userId,
@@ -65,6 +66,7 @@ const ScoreBoard = ({
       >
         <ScoreForm game={data.game} closeModal={closeModal} />
       </Modal>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -72,10 +74,7 @@ const ScoreBoard = ({
               <BackButton />
               <div className="flex -space-x-3">
                 {game?.players.map((p) => (
-                  <Avatar key={p.id}>
-                    <AvatarImage src={p.image ?? ""} />
-                    <AvatarFallback>{p.name![0]}</AvatarFallback>
-                  </Avatar>
+                  <PlayerAvatar player={p} key={p.id} showTooltip />
                 ))}
               </div>
             </div>
@@ -100,15 +99,13 @@ const ScoreBoard = ({
         <CardFooter className="flex flex-col items-start space-y-2">
           <div className="flex items-center space-x-2">
             <p>Created by: </p>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={game?.creator.image ?? ""} />
-              <AvatarFallback>{game?.creator.name![0]}</AvatarFallback>
-            </Avatar>
+            <PlayerAvatar player={game?.creator as Player} />
             <p>{game?.creator.username}</p>
           </div>
           <p className="text-sm text-muted-foreground">
             {board?.highestWins ? "Highest" : "Lowest"} total wins!
           </p>
+          {board?.ended && <FinalScores game={board} gameId={gameId} />}
         </CardFooter>
         <div
           className={cn("hidden", game?.creatorId === user.id && "md:block")}
@@ -170,7 +167,7 @@ const ScoreForm = ({
         {game?.players.map((p) => (
           <div key={p.id} className="my-2 grid grid-cols-3 gap-2">
             <p>{p.username}</p>
-            <Input className="col-span-2" name={p.id!} required />
+            <Input className="col-span-2" name={p.id!} required type="number" />
           </div>
         ))}
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { CompleteFriend } from "@/lib/db/schema/friends";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import { deleteFriendAction, updateFriendAction } from "@/lib/actions/friends";
 import FriendListTile from "./FriendListTile";
 import { getFriendData } from "@/lib/utils";
 import DeleteButton from "../shared/DeleteButton";
+import PlayerAvatar from "../shared/PlayerAvatar";
 
 export default function FriendsList({
   friends,
@@ -44,13 +44,7 @@ export default function FriendsList({
               return (
                 <TableRow key={f.id}>
                   <TableCell>
-                    <Avatar>
-                      <AvatarImage
-                        src={friendParsed.image ?? undefined}
-                        alt={`${friendParsed.name} avatar`}
-                      />
-                      <AvatarFallback>{friendParsed.name?.[0]}</AvatarFallback>
-                    </Avatar>
+                    <PlayerAvatar player={friendParsed} />
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">{friendParsed.name}</span>
